@@ -1,0 +1,19 @@
+ {
+  "Token": "MY TOKEN",
+  "ApiYoutube": "AIzaSyB0pME8wP17j8q8H_U2pa4n9Qs5rVbWybo",
+  "Prefix": "Project/",
+  "Time": "18000",
+  "User": ["459723923282591755","459723923282591755","459723923282591755",""],
+  "Réponse": ["peut etre","jsp","mdr","ta dit quoi.","bienvue","Nn","OMG comment tu sais","oui","stv","OK."],
+  "Clash": ["Tu vois ta mère, bah j'en fais mon univers","J'écris des textes tirés par les ch'veux, comme ta meuf en levrette","J'distribuais des CD dans l'hexagone, pendant qu'tu distribuais tes CV dans les Mac Do, \nj'comprends qu'tu voudrais faire un feat, mais moi j'voudrais un Big Mac et une grande frite","J’baise ta meuf et j’me fais des pâtes, pour partir plus vite, j’respecte même pas l’temps d’cuisson","Si j'connais ta meuf, ça veut dire qu't'es cocu"],
+  "LinkEmbed": "LE MSG A METTRE DANS L EMBED POUR LE SPAM",
+  "LinkNormal": "LE MSG A METTRE DANS LE SPAM TEXT",
+  "TimeSpam": "750",
+  "TimeRaid": "750",
+  "Raid": "GUARDIANS",
+  "Region": ["brazil", "us-west", "singapore", "eu-central", "hongkong", "us-south", "amsterdam", "us-central", "london", "us-east", "sydney", "japan", "eu-west", "frankfurt", "russia"],
+  "Raideur": ["G", "U", "A", "R", "D", "I", "A", "N", "S"],
+  "NombreRaid": "9",
+  "TokenList": ["","","",""],
+  "ProxtList": ["","","",""]
+}
