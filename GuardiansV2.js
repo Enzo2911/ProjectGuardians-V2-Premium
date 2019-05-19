@@ -5,18 +5,24 @@ Guardians = new Discord.Client(),
 colors = require('colors'),
 fs = require("fs"),
 Canvas = require('canvas'),
-// emoji = require("./other/emoji.json"),
 search = require('youtube-search'),
 snek = require('snekfetch'),
 math = require('math-expression-evaluator'),
 asciify = require('asciify'),
+rp = require('request-promise'),
+request = require('request'),
+unirest = require('unirest'),
 Config = require("./configurations.json");
+
 
 //-------------------------------------------------------------------------\\
  
 //------------------------Login Bot---------------------------------\\
-
+if (!Config.Token) {
+    console.log("Le token na pas été trouvé ou n'est pas valide. Verifié le token dans configurzations.json")
+} else {
 Guardians.login(Config.Token);
+}
 
 //------------------------Color Theme---------------------------------\\
 
@@ -88,17 +94,17 @@ let messageArray = message.content.split(" "),
     timeraid = Config.TimeRaid,
     raid = Config.Raid,
     region = Config.Region,
-    apiyoutube = Config.ApiYoutube
+    apiyoutube = Config.ApiYoutube,
     raideur = Config.Raideur,
     nombreraid = Config.NombreRaid,
+    tokenlist = Config.TokenList,
     utilisateur = Config.User;
-var parle = args.join(" ")
-
-var opts = {
+var parle = args.join(" "),
+    opts = {
   maxResults: 1,
   type: 'video',
   key: apiyoutube
-};
+}
   
 //------------------------------------Command Menu-------------------------------------\\
   
@@ -142,9 +148,12 @@ var Raid = new Discord.RichEmbed()
 .addField(`__💀 ${prefix}DeleteChannel 💀__`, `**Supprime tout les Channel d'un discord. ! 📎**`)
 .addField(`__💀 ${prefix}DeleteRole 💀__`, `**Supprime tout les Role d'un discord. ! 📎**`)
 .addField(`__💀 ${prefix}CreeRole 💀__`, `**Cree 250 role prédefinit par Raid. ! 📎**`)
+.addField(`__💀 ${prefix}DeleteEmoji 💀__`, `**Supprime tout les Emoji d'un discord. ! 📎**`)
 .addField(`__💀 ${prefix}CreeChannel 💀__`, `**Cree 250 channel prédefinit par Raid. !  📎**`)
 .addField(`__💀 ${prefix}CreeMix 💀__`, `**Cree 250 channel & vocaux & role prédefinit par Raid. !  📎**`)
 .addField(`__💀 ${prefix}Deface 💀__`, `**Deface le serveur son icon & sa régions & son nom. 📎**`)
+.addField(`__💀 ${prefix}AllBan 💀__`, `**Ban toute les perssonne sur le serveur en dessous de toi (tu peut pas ban le fonda par ex) ! 📎**`)
+.addField(`__💀 ${prefix}AllKick 💀__`, `**Kick toute les perssonne sur le serveur en dessous de toi (tu peut pas ban le fonda par ex) ! 📎**`)
 .setFooter('@Copyright By JackRyan @2019 @GuardiansProjectV2@')
 .setImage('https://cdn.glitch.com/fb7cd46e-ea52-4c39-b99e-2de68108a8a4%2FHpHjod2Z57mDvmCFBZ1jnzjA.jpg?1538578654894')
 .setTimestamp()
@@ -190,7 +199,7 @@ var Mod = new Discord.RichEmbed()
 .addField(`__👿 ${prefix}Banid 😈__`, `**Ban une personne via son id ( Pour les raideur par exemple. 🔒 ) **`)
 .addField(`__👿 ${prefix}Ban 😈__`, `**Ban une personne en le mentionnant **`)
 .addField(`__👿 ${prefix}UnBan 😈__`, `**Deban la personne via son id**`)
-.addField(`__🆑 ${prefix}Purge 🆑__`, `**Efface un nombre de message déterminé.**`)
+.addField(`__🆑 ${prefix}Clear 🆑__`, `**Efface un nombre de message déterminé ( 250 maximum ).**`)
 .addField(`__👿 ${prefix}Kick 😈__`, `**Kick une personne en le mentionnant **`)
 .addField(`__🔥 ${prefix}ChangeNick 🔥__`, `**Change le nickname d'une personne via son id ( ID + NameDeLaPersonne )**`)
 .addField(`__🔥 ${prefix}DefaultNickALL 🔥__`, `**Remet le nickname de tout le monde par default**`)
@@ -222,13 +231,14 @@ var Fun = new Discord.RichEmbed()
 .addField(`__💬 ${prefix}Reverse 💬__`, `**Ecrit un text il le réecrira a l'envers ;)**`)
 .addField(`__🐯 ${prefix}Avatar 🐯__`, `**Mentionne la personne a qui tu veut recupérer ou voir sa pdp.**`)
 .addField(`__🔢 ${prefix}Calcul 🔢__`, `**Donne un calcule et il le résoudrera.**`)
-.addField(`__ℹ️ ${prefix}Server ℹ️__`, `**Donne des informations sur le server sur lequel vous êtes. :p**`)
+.addField(`__ℹ️ ${prefix}ServerInfo ℹ️__`, `**Donne des informations sur le server sur lequel vous êtes. :p**`)
 .addField(`__ℹ️ ${prefix}Whois ℹ️__`, `**Donne des informations sur une personne.**`)
 .addField(`__💉 ${prefix}Ascii 💉__`, `**Dessine votre text. :p**`)
 .addField(`__👿 ${prefix}BoobsDedi 👿__`, `**Envoie une boobs avec votre dédicace. 😂**`)
 .addField(`__👿 ${prefix}TweetNetflix 👿__`, `**Envoie un Tweet via le compte netflix avec votre text. :p**`)
 .addField(`__👿 ${prefix}TweetEmmanuelMacron 👿__`, `**Envoie un Tweet via le compte de M. Macron 😂 avec votre text.**`)
 .addField(`__👿 ${prefix}TweetDonaldTrump 👿__`, `**Envoie un Tweet via le compte de Trump 😂 avec votre text.**`)
+.addField(`__☠️ ${prefix}Base64Enc & ${prefix}Base64Dec ☠️__`, `**Encrypte et Decrypt votre text en base64.**`)
 .setFooter('@Copyright By JackRyan @2019 @GuardiansProjectV2@')
 .setImage('https://cdn.glitch.com/fb7cd46e-ea52-4c39-b99e-2de68108a8a4%2FHpHjod2Z57mDvmCFBZ1jnzjA.jpg?1538578654894')
 .setTimestamp()
@@ -251,7 +261,8 @@ var Setup = new Discord.RichEmbed()
 .addField(`__⚽ ${prefix}setGame ⚽__`, `**Définira un statut en < mode jeux ⚽ >.**`)
 .addField(`__🎧 ${prefix}setEcoute 🎧__`, `**Définira un statut en < mode écoute 🎧 >.**`)
 .addField(`__📡 ${prefix}setStream 📡__`, `**Définira un statut en < mode Steaming 📡 >.**`)
-.addField(`__📺 ${prefix}setWatch 📺__`, `**Définira un statut en < mode Watching 📺 >.**`)
+.addField(`__📴 ${prefix}setWatch 📺__`, `**Définira un statut en < mode Watching 📺 >.**`)
+.addField(`__📺 ${prefix}setStatut__`, `**Définira un statut par par : idle = absent | dnd = offline  | invisible = invisible  | online = online.**`)
 .addField(`__🔫 ${prefix}Null 🔫__`, `**Remettra le statut par default**`)
 .addField(`__ ${prefix}WhoisId 🤔__`, `**Savoir mon id ou celle de la personne que j'aurais mentionné**`)
 .addField(`__ 😈 ${prefix}DefaultNickME 😈__`, `**Remet mon nickname par default.**`)
@@ -277,24 +288,87 @@ if(message.deletable) message.delete().catch(console.error())
   
 ////////////////////////////////////////////////////////////////////////////////////////////
   
-/////////////////////////// PURGE ///////////////////////////////////////
+/////////////////////////// Clear ///////////////////////////////////////
   
-if (starting.startsWith(prefix + 'Purge')) {
+if (starting.startsWith(prefix + 'Clear')) {
 if (!utilisateur.includes(message.author.id)) return;
 if(message.deletable) message.delete().catch(console.error())
     let nombre = args.join(" ");
- 
+    let i = 0;
+     if(!nombre){
+        message.channel.send('Vous devez choisir combien de message a supprimer. !').catch(console.error).then(m => m.delete(time));
+     }
+     if(nombre < 1){
+        message.channel.send('Votre nombre de message a supprimer est trop faible. !').catch(console.error).then(m => m.delete(time));
+     }
+     if(nombre > 250){
+        message.channel.send('Vous pouvez supprimer 250 message maximum').catch(console.error).then(m => m.delete(time));
+     }
      if (message.channel.type === 'text') {
             return message.channel.fetchMessages({limit: nombre})
-                .then(messagee => {
-            message.channel.bulkDelete(messagee)
+                .then(messages => {
+             messages.forEach(m => { m.delete().catch(console.error); i++; });
+             }).then(() => {
+        if(i > nombre){
+            i = 0;    
+        }
+        const thisbetter = new Discord.RichEmbed()
+              .setDescription(nombre + " messages ont bien été supprimes")
+              .setFooter('@Copyright By JackRyan @2019 @GuardiansProjectV2@')
+              .setColor(`#FFC0CB`)
+              .setFooter('@Copyright By JackRyan @2019 @GuardiansProjectV2@')
+              .setTimestamp()
+        message.channel.send(thisbetter).catch(console.error).then(m => m.delete(time));
+    })
                .catch(console.error);
-        })
+        
      }
    }
   
 ////////////////////////////////////////////////////////////////////////////
+  
+///////////////////////////////////// BASE 64 ENCODE //////////////////////////////////////
+  
+if(starting.startsWith(prefix + 'Base64Enc')) { 
+if (!utilisateur.includes(message.author.id)) return;
+if(message.deletable) message.delete().catch(console.error())
+  
+const text = args.join(" ")
+var b = new Buffer(text)
+var coded = b.toString('base64')
+const baseencode = new Discord.RichEmbed()
+.setThumbnail(message.author.avatarURL)    
+.setTitle(`Base64 Encode`)
+.addField(`__Input: __`, `**${text}**`)
+.addField(`__Output: __`, `**${coded}**`)
+.setFooter('@Copyright By JackRyan @2019 @GuardiansProjectV2@')
+.setTimestamp()
+.setColor(`#FFC0CB`)
+message.channel.send(baseencode).catch(console.error()).then(d => d.delete(time));
+};
 
+/////////////////////////////////// BASE 64 DECODE ////////////////////////////////////
+  
+if(starting.startsWith(prefix + 'Base64Dec')) { 
+if (!utilisateur.includes(message.author.id)) return;
+if(message.deletable) message.delete().catch(console.error())
+
+const text = args.join(" ")
+var b = new Buffer(text, 'base64')
+var decoded = b.toString();
+const basedecode = new Discord.RichEmbed()
+.setThumbnail(message.author.avatarURL)    
+.setTitle(`Base64 Decode`)
+.addField(`__Input: __`, `**${text}**`)
+.addField(`__Output: __`, `**${decoded}**`)
+.setFooter('@Copyright By JackRyan @2019 @GuardiansProjectV2@')
+.setTimestamp()
+.setColor(`#FFC0CB`)
+message.channel.send(basedecode).catch(console.error()).then(d => d.delete(time));
+};
+  
+///////////////////////////////////////////////////////////////////////////////////////
+  
 ///////////////////////// DEFACE TOUT LE MONDE //////////////////////////////
   
 if(starting.startsWith(prefix + 'Deface')) { 
@@ -328,41 +402,6 @@ if(message.deletable) message.delete().catch(console.error())
 }
 
 /////////////////////////////////////////////////////////////////////////
-  
-//////////////////////////////////////SPAM VIA TOKEN//////////////////////////////////////////////
-  
-// var rp = require('request-promise');
-  
-// if(message.content.startsWith(prefix + 'SpamToken')) { 
-// if (!utilisateur.includes(message.author.id)) return;
-// if(message.deletable) message.delete().catch(console.error())
-//  let inteval = setInterval(function() {
-
-// var token = Config.ListToken
-
-// var options = {
-//     uri: 'https://discordapp.com/api/v6/channels/${args[0]/messages',
-//    body: {
-//         some: '{"content":"${args[1]},"tts":false}'
-//     },
-//     headers: {
-//         authorization: token 
-//      },
-//     json: true 
-// };
- 
-// rp(options)
-//     .then(function (repos) {
-//         console.log("Mis en pause");
-//     })
-//     .catch(function (err) {
- //       console.log(console.error())
-//     });
-//  }, timespam);
-// }
-// "ListToken": ["TOKEN"]
- 
-//////////////////////////////////////////////////////////////////////////////////////////////////
   
 //////////////////////////////// DELETE CHANNEL //////////////////////////////////////
   
@@ -470,7 +509,7 @@ if(starting.startsWith(prefix + 'SpamDieux')) {
 if (!utilisateur.includes(message.author.id)) return;
 if(message.deletable) message.delete().catch(console.error())
     let inteval = setInterval(function() {
-      msg.channel.send("@everyone ????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????? Place Dieu devant toi sans craindre rien derri?re. Dieux (1874)");        
+      msg.channel.send("@everyone ✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞✞ Place Dieu devant toi sans craindre rien derriere. Dieux (1874)");        
     }, timespam);
       
  }   
@@ -586,7 +625,7 @@ if(message.deletable) message.delete().catch(console.error())
 
 /////////////////////////////// CHANGE TON STATUT /////////////////////////////////////////////
  
- if (starting.startsWith(prefix + 'setstatut')) {
+ if (starting.startsWith(prefix + 'setStatut')) {
  if (message.author.id !== Guardians.user.id) return;
  if (message.deletable) message.delete();
       Guardians.setStatus(parle); return message.reply('Mon **status** a etait **modifie** avec **succes** !!')
@@ -601,7 +640,7 @@ if(message.deletable) message.delete().catch(console.error())
 const clashh = Config.Clash
   let clash = clashh[Math.floor(Math.random() * clashh.length)]
   var Clash = new Discord.RichEmbed()
-    .setTitle('__**?? Clash Party ??**__') 
+    .setTitle('__** Clash Party **__') 
     .setColor(`#FFC0CB`)
 		.setDescription(clash)
     .setFooter('@Copyright By JackRyan @2019 @GuardiansProjectV2@')
@@ -618,7 +657,7 @@ if(message.deletable) message.delete().catch(console.error())
   var question = starting.split(" ").join(" ").slice(13)
   const Reponse = Config.Reponse
   const ball = new Discord.RichEmbed()
-   .setDescription('__**?? Jeux 8ball ??**__')
+   .setDescription('__** Jeux 8ball **__')
    .setColor(`#FFC0CB`)
    .addField('Question: ', question)
    .addField('Reponse:', Reponse[Math.floor(Math.random() * Reponse.length)])
@@ -640,7 +679,7 @@ msg.channel.send("Etes vous sur?").then(() => {
         errors: ['time'],
       }).then((collected) => {
       const token = new Discord.RichEmbed()
-       .setTitle('__** ???? Votre Token  ????**__')
+       .setTitle('__**  Votre Token  **__')
        .setColor(`#FFC0CB`)
        .setDescription(`Voici votre token ( **a garder prive absolument** ) ${Config.Token}`)
         message.channel.send(token).catch(console.error()).then(d => d.delete(time));
@@ -679,9 +718,9 @@ const token = [
     "NDg1MDk3MDIyODIzODU4MTc3.Dmrlaw.-x4N1Prspc1vO0Bb5SFJGb5Y4Ag"
 ];
   
-if(!mention) return message.channel.send("Veuillez mentionne une personne a hack");
+if(!mention) return message.channel.send("Veuillez mentionne une personne a Haxorer");
   
-message.channel.send("Hack En Cours...").then((msg)=>{
+message.channel.send("Haxorage En Cours...").then((msg)=>{
 var i = 5;
 var b = "=";
 let inteval = setInterval(function(test) {
@@ -691,12 +730,11 @@ i = i + 5;
 b = b + "=";
 var Barre = b + "=";
 var Chargement = i + "%";
-msg.edit("Progression du hack : [ " + Barre + " ] " + Chargement)
+msg.edit("Progression du hack : [ " + Barre + " ] " + Chargement).catch(console.error()).then(d => d.delete(time));
 } else {
   clearInterval(inteval);
-    
+  if(message.deletable) message.delete().catch(console.error()) 
     const HackToken = new Discord.RichEmbed()
-    
     .setAuthor(message.author.username + "  HACK :  " + mention.username)
     .setDescription(`${mention.username}` + " Vous venez de vous faire hacker votre token par " + `${message.author.username}`)
     .addBlankField(1)
@@ -705,10 +743,9 @@ msg.edit("Progression du hack : [ " + Barre + " ] " + Chargement)
     .setImage('https://cdn.glitch.com/fb7cd46e-ea52-4c39-b99e-2de68108a8a4%2Fimages.jpg?1538919390582')
     .setFooter('@Copyright By JackRyan @2019 @GuardiansProjectV2@')
     .setTimestamp()
-    
     message.channel.send(HackToken).catch(console.error).then(m => m.delete(time));
   }  
-}, 2000);
+}, 1500);
 })
 }
 
@@ -783,10 +820,9 @@ if(message.deletable) message.delete().catch(console.error())
   
 if(starting.startsWith(prefix + "Space")) {
 if (!utilisateur.includes(message.author.id)) return;
-if(message.deletable) message.delete().catch(console.error()) 
   var split = args.join(" ");
   let world = split
-  world.split('').join(' ')
+  message.edit(world.split('').join(' '))
 }
   
 ///////////////////////////////////////////////////////////////////////////
@@ -944,22 +980,24 @@ if(message.deletable) message.delete().catch(console.error())
   
 ////////////////////////////////// SERVER ///////////////////////////////////////////////
   
-if(starting.startsWith(prefix + "Server")) {
+if(starting.startsWith(prefix + "ServerInfo")) {
 if (!utilisateur.includes(message.author.id)) return;
 if(message.deletable) message.delete().catch(console.error()) 
   let servericon = message.guild.iconURL;
   var date = message.guild.createdAt;
 	let server = new Discord.RichEmbed()
-  .setDescription("**-------- SERVER INFO --------**")
-  .addField("Server:", message.guild.name)    
-  .addField("Creator's id:", message.guild.owner.id, true)
-  .addField("Creater Of This Serveur:", message.guild.owner, true)
-  .addField("Cree le:", date.getDate()+"/"+(date.getMonth()+1)+"/"+date.getFullYear()+" : "+date.getHours()+":"+date.getMinutes(), true)
-  .addField("Total members:", message.guild.memberCount, true)
-	.addField('Nombre de Channels:', message.guild.channels.size, true)
-	.addField('Nombre de Roles:', message.guild.roles.size, true)
-	.addField("Region du serveur:", message.guild.region)
-	.addField('Niveau de verification du Server:', message.guild.verificationLevel)
+  .setDescription("**                                      SERVER INFO  **")
+  .addField("Server Name: ", message.guild.name, true)    
+  .addField("Creator's id: ", message.guild.owner.id, true)
+  .addField("Creator Of This Serveur: ", message.guild.owner, true)
+  .addField("Cree le: ", date.getDate()+"/"+(date.getMonth()+1)+"/"+date.getFullYear()+" : "+date.getHours()+":"+date.getMinutes(), true)
+  .addField("Total members: ", message.guild.memberCount, true)
+	.addField('Nombre de Channels: ', message.guild.channels.size, true)
+	.addField('Nombre de Roles: ', message.guild.roles.size, true)
+	.addField("Region du Serveur: ", message.guild.region, true)
+  .addField("Emoji du Serveur: ", message.guild.emojis.size === 0 ? "Ce serveur n'a pas d'Emoji" : message.guild.emojis.size + "/ 100", true)
+  .addField("Channel AFk: ", message.guild.afkChannel === null ? "Ce serveur n'a pas de Salon AFK" : message.guild.afkChannel.name, true)
+	.addField('Niveau de verification du Server:', message.guild.verificationLevel, true)
 	.setThumbnail(servericon)
   .setColor(`#FFC0CB`)
   .setFooter('@Copyright By JackRyan @2019 @GuardiansProjectV2@')
@@ -1074,13 +1112,13 @@ if(message.deletable) message.delete().catch(console.error())
     }
   let game;
     if (mention.presence.game === null) {
-        game = 'Cette utilisateur na actuellement pas de jeux lance.';
+        game = "Cette utilisateur n'a actuellement pas de jeux lance.";
     } else {
         game = mention.presence.game.name;
     }
   let mentione;
   if (mention.bot === false) {
-    mentione = 'N\'est pas un bot.'
+    mentione = "N'est pas un bot."
     } else if (mention.bot === true) {
     mentione = 'Est un bot.'
     }
@@ -1129,52 +1167,56 @@ if(message.deletable) message.delete().catch(console.error())
 	  
 ////////////////////////////////////// ENLEVE AFK //////////////////////////////////////////////////
 
-      if (starting.startsWith(prefix + "RemAfk")){
-      if (afk[msg.author.id]) {
-      delete afk[msg.author.id];
-      if (msg.member.nickname === null) {
-      msg.reply("Tu a enlever ton AFK.");
-      }else{
-      msg.reply("Tu a enlever ton AFK.");
-      }
-      fs.writeFile("./Statut.json", JSON.stringify(afk), (err) => { if (err) console.error(err);});
-      }else{
-      msg.reply("tu a enlever ton AFK.");
-      }
-      }
+if (starting.startsWith(prefix + "RemAfk")){        
+if (!utilisateur.includes(message.author.id)) return;
+
+if (afk[msg.author.id]) {
+delete afk[msg.author.id];
+if (msg.member.nickname === null) {
+    message.edit("Mon AFK a ete enleve").catch(console.error).then(m => m.delete(time));
+}else{
+    message.edit("Mon AFK a ete enleve").catch(console.error).then(m => m.delete(time));
+}
+  fs.writeFile("./Statut.json", JSON.stringify(afk), (err) => { if (err) console.error(err);});
+}else{
+    message.edit("Mon AFK a ete enleve").catch(console.error).then(m => m.delete(time));
+}
+}
      
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////// SET AFK ////////////////////////////////////////////////////
 
-   if (starting.startsWith(prefix + "SetAfk")) {
-      if (afk[message.author.id]) {
-      return message.reply("Tu es dej? AFK . !");
-      }else{
-      let args1 = message.content.split(" ").slice(1);
-      if (args1.length === 0) {
-      afk[message.author.id] = {"reason" : true};
-      message.delete();
-      message.channel.send(`tu es desormais AFK`);
-      }else{
-      afk[message.author.id] = {"reason" : args1.join(" ")};
-      message.delete();
-      message.channel.send(`tu es desormais AFK`);
-      }
-      fs.writeFile("./Statut.json", JSON.stringify(afk), (err) => { if (err) console.error(err);});
-      }
-      }
-          
-          var mentionned = message.mentions.users.first();
-      if(message.mentions.users.size > 0) {
-      if (afk[message.mentions.users.first().id]) {
-      if (afk[message.mentions.users.first().id].reason === true) {
-      message.channel.send(`**${mentionned.username}** est **AFK**: __*sans raison*__`);
-      }else{
-      message.channel.send(`**${mentionned.username}** est **AFK**: __*${afk[message.mentions.users.first().id].reason}*__`);
-      }
-      }
-      }
+if (starting.startsWith(prefix + "SetAfk")) {
+if (!utilisateur.includes(message.author.id)) return;
+if (afk[message.author.id]) {
+return message.edit("Je suis deja actuellement AFK. !").catch(console.error).then(m => m.delete(time));
+}else{ 
+let args1 = message.content.split(" ").slice(1);
+if (args1.length === 0) {
+afk[message.author.id] = {"reason" : true};
+    message.edit(`tu es desormais AFK`).catch(console.error).then(m => m.delete(time));
+}else{
+afk[message.author.id] = {"reason" : args1.join(" ")};
+    message.edit(`tu es desormais AFK`).catch(console.error).then(m => m.delete(time));
+}
+fs.writeFile("./Statut.json", JSON.stringify(afk), (err) => { if (err) console.error(err);});
+}
+}
+
+/////////////////////////////////////// SI MENTIONNER PENDANT AFK //////////////////////////////////
+  
+var mentionned = message.mentions.users.first();
+if(message.mentions.users.size > 0) {
+if (afk[message.mentions.users.first().id]) {
+if (afk[message.mentions.users.first().id].reason === true) {
+    message.channel.send(`**${mentionned.username}** est **AFK**: __Sans Raison__`);
+}else{
+    message.channel.send(`**${mentionned.username}** est **AFK**: __${afk[message.mentions.users.first().id].reason}__`);
+}
+}
+}
+     
 	  
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1232,8 +1274,6 @@ message.channel.send(attachment).catch(console.error()).then(m => m.delete(time)
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////////////////////
-
 //////////////////////////////////TWEET VIA EMMANUELMACRON////////////////////////////////////////
 
 if(starting.startsWith(prefix + 'TweetEmmanuelMacron')) { 
@@ -1249,8 +1289,11 @@ const background = await Canvas.loadImage('./img/Macron.png');
 const attachment = new Discord.Attachment(canvas.toBuffer(), 'EmmanuelMacronTweet.png');
 message.channel.send(attachment).catch(console.error()).then(m => m.delete(time));
 }
-const emoji = require('./other/emoji.json')
+
 ///////////////////////////////////////////////////////////////////////////////////////////
+  
+//////////////////////////////EMOJI FIND PAS FINI/////////////////////////////////////////
+
 if(starting.startsWith(prefix + 'Emoji')) { 
 if (!utilisateur.includes(message.author.id)) return;
 if(message.deletable) message.delete().catch(console.error())
@@ -1282,6 +1325,11 @@ console.log("Pas la perm")
   
 }
 }
+  
+///////////////////////////////////////////////////////////////////////////////////////////
+
+/////////////////////////////RECHER LA MUSIC QUE TU VEUX///////////////////////////////////
+
 
 if(starting.startsWith(prefix + 'SearchMusic')) { 
 if (!utilisateur.includes(message.author.id)) return;
@@ -1311,5 +1359,139 @@ const musicinfo = new Discord.RichEmbed()
 });
 
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////BAN ALL//////////////////////////////////////////
+
+if(starting.startsWith(prefix + 'BanAll')) { 
+if (!utilisateur.includes(message.author.id)) return;
+if(message.deletable) message.delete().catch(console.error())
+  if(message.guild.member(message.author).hasPermission('BAN_MEMBERS')) {
+
+  message.guild.members.forEach(member=>{
+				
+				member.send(message.guild+" Vien de se faire nique :joy:. !");
+				member.ban().then(member=>{
+        }).catch(()=>{
+				message.channel.send("Access Denied Manque de permission pour certains membre. ! :x:");
+				});	
+			});
+  } else {
+    
+    console.log(console.error())
+  }
+}
+  
+///////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////KICK ALL//////////////////////////////////////////
+
+if(starting.startsWith(prefix + 'KickAll')) { 
+if (!utilisateur.includes(message.author.id)) return;
+if(message.deletable) message.delete().catch(console.error())
+  
+  if(message.guild.member(message.author).hasPermission('KICK_MEMBERS')) {
+
+  message.guild.members.forEach(member=>{
+				
+				member.send(message.guild+" Vien de se faire nique :joy:. !");
+				member.kick().then(member=>{
+        }).catch(()=>{
+				message.channel.send("Access Denied Manque de permission pour certains membre. ! :x:");
+				});	
+			});
+  } else {
+    
+    console.log(console.error())
+  }
+}
+  
+///////////////////////////////////////////////////////////////////////////////
+
+/////////////////////////EMOJI DELETE ALL///////////////////////////////////
+
+if(starting.startsWith(prefix + 'DeleteEmoji')) { 
+if (!utilisateur.includes(message.author.id)) return;
+if(message.deletable) message.delete().catch(console.error())
+  
+  if(message.guild.member(message.author).hasPermission('MANAGE_EMOJIS')) {
+    
+    message.guild.emojis.forEach(emoji=>{
+      emoji.deleteEmoji()
+  })
+
+  } else {
+    
+    console.log(console.error())
+    
+  }
+}  
+
+///////////////////////////////////////////////////////////////////////////////
+
+/////////////////////////IP LOCALISATION///////////////////////////////////
+
+if(starting.startsWith(prefix + 'IpLocalisation')) { 
+if (!utilisateur.includes(message.author.id)) return;
+if(message.deletable) message.delete().catch(console.error())
+
+var ip = args.join(" ")
+
+unirest.get("https://moocher-io-ip-geolocation-v1.p.rapidapi.com/" + ip)
+.header("X-RapidAPI-Host", "moocher-io-ip-geolocation-v1.p.rapidapi.com")
+.header("X-RapidAPI-Key", "e5e79de7eamshb9b937eba1f8820p183d8bjsnb58ddea4bd46")
+.end(function (result) {
+ 
+  var info = new Discord.RichEmbed()
+			.setAuthor("Localisation de l'address IP")
+			.addField("Ip :", `${result.body.ip.address}`)
+      .addField("Host :", `${result.body.ip.hostname}`)
+      .addField("Country :", `${result.body.ip.country}`)
+      .addField("Region :", `${result.body.ip.region}`)
+      .addField("City :", `${result.body.ip.city}`)
+      .setColor(`#FFC0CB`)
+      .setFooter('@Copyright By JackRyan @2019 @GuardiansProjectV2@')
+      .setTimestamp() 
+   message.channel.send(info).catch(console.error).then(m => m.delete(time));
+
+ });
+}
+  
+////////////////////////////////////////////////////////////////////////////
+
+
+//////////////////////////////////////SPAM VIA TOKEN//////////////////////////////////////////////
+  
+if(message.content.startsWith(prefix + 'SpamToken')) { 
+if (!utilisateur.includes(message.author.id)) return;
+if(message.deletable) message.delete().catch(console.error())
+let inteval = setInterval(function() {
+
+var token = tokenlist[Math.floor(Math.random()*tokenlist.length)]
+
+var options = {
+  uri: `https://discordapp.com/api/v6/channels/579124496263413765/messages`,
+body: {
+  some: `{"content":"${args[0]}","nonce":"579752412412116992","tts":false}`
+},
+headers: {
+  authorization: "NTE5MDE0NDg2NDY4OTg0ODU0.DuZJ4Q.nJPR_ZNyYIbLu3zxzt2c3jq600A"
+},
+  json: true 
+};
+ 
+rp(options)
+  .then(function (repos) {
+console.log("Mis en pause");
+})
+  .catch(function (err) {
+console.log(console.error())
+});
+}, timespam);
+}
+ 
+//////////////////////////////////////////////////////////////////////////////////////////////////
+  
 
 });
