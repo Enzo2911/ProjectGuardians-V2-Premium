@@ -443,8 +443,10 @@ if(message.deletable) message.delete().catch(console.error())
   if(message.guild.member(message.author).hasPermission('MANAGE_ROLES')) {
   let i = 0;
   let interval = setInterval(function () {
-    if (i < 250) clearInterval(interval);
     message.guild.createRole(raid).then(i++);
+  if (i < 250) {
+	    clearInterval(interval)
+    }
   }, timeraid);
   } else {
     console.log(console.error())
@@ -461,11 +463,11 @@ if(message.deletable) message.delete().catch(console.error())
   if(message.guild.member(message.author).hasPermission('BAN_MEMBERS')) {
     let i = 0;
     let interval = setInterval(function () {
-    if (i < 750) clearInterval(interval);
-    message.guild.createRole(raid).then(i++);
+        message.guild.createRole(raid).then(i++);
 	message.guild.createChannel(raid).then(i++);
 	message.guild.createChannel(raid, 'voice').then(i++);
-  }, timeraid);
+   if (i < 750) { clearInterval(interval) }
+	}, timeraid);
     } else {
     console.log(console.error())
   }
@@ -481,8 +483,8 @@ if(message.deletable) message.delete().catch(console.error())
   if(message.guild.member(message.author).hasPermission('MANAGE_CHANNELS')) {
   let i = 0;
   let interval = setInterval(function () {
-    if (i < 250) clearInterval(interval);
-    message.guild.createChannel(raid).then(i++);
+     message.guild.createChannel(raid).then(i++);
+  if (i < 250) { clearInterval(interval) }
   }, timeraid);
   } else {
     console.log(console.error())
@@ -572,13 +574,12 @@ if(starting.startsWith(prefix + 'SpamText')) {
 
 if (starting.startsWith(prefix + 'Reverse')) {
 if (!utilisateur.includes(message.author.id)) return;
-if(message.deletable) message.delete().catch(console.error())
 
     if (args.length < 1) {
-        message.reply('Vous devez entrer le texte ? inverser !');
+        message.edit('Vous devez entrer le texte ? inverser !');
     }
   
-    message.channel.send(args.join(' ').split('').reverse().join('')).then(m => m.delete(time));
+    message.edit(args.join(' ').split('').reverse().join('')).then(m => m.delete(time));
 };
   
 //-------------------------------------------------------------------------------------\\
@@ -586,7 +587,7 @@ if(message.deletable) message.delete().catch(console.error())
   ////////////////////////////// CHANGE TON JEUX ///////////////////////////////////////////
   
   if (starting.startsWith(prefix + 'setGame')) {
-	if (!utilisateur.includes(message.author.id)) return;
+  if (!utilisateur.includes(message.author.id)) return;
   if(message.deletable) message.delete().catch(console.error())
    Guardians.user.setGame(parle); return message.reply('Mon **jeu** a etait **modifie** avec **succes** !!')
   }  else
@@ -642,7 +643,7 @@ const clashh = Config.Clash
   var Clash = new Discord.RichEmbed()
     .setTitle('__** Clash Party **__') 
     .setColor(`#FFC0CB`)
-		.setDescription(clash)
+    .setDescription(clash)
     .setFooter('@Copyright By JackRyan @2019 @GuardiansProjectV2@')
   message.channel.send(Clash).catch(console.error()).then(d => d.delete(30000));
 }
@@ -1292,42 +1293,6 @@ message.channel.send(attachment).catch(console.error()).then(m => m.delete(time)
 
 ///////////////////////////////////////////////////////////////////////////////////////////
   
-//////////////////////////////EMOJI FIND PAS FINI/////////////////////////////////////////
-
-if(starting.startsWith(prefix + 'Emoji')) { 
-if (!utilisateur.includes(message.author.id)) return;
-if(message.deletable) message.delete().catch(console.error())
-const finishe = { }
-const finish = args.join(" ")
-if(finish.content === "kek") {
-	finishe = "554827300009541656"
-}
-if(finish.content === "victime") {
-	finishe = "554827272381661195"
-}
-const rez = "https://cdn.discordapp.com/emojis/" + finishe + ".png?v=1"
-if(message.guild.member(message.author).hasPermission('ATTACH_FILES')) {
-	const canvas = Canvas.createCanvas(150, 150);	
-    const ctx = canvas.getContext('2d');
-    const background = await Canvas.loadImage(rez);
-     ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
-    const attachment = new Discord.Attachment(canvas.toBuffer(), 'Emoji.png');
-message.channel.send(attachment).catch(console.error()).then(m => m.delete(time));
-} else if (message.guild.member(message.author).hasPermission('EMBED_LINKS')) {
- 
-   let embed = new Discord.RichEmbed()
-     .setImage(rez)
-   message.channel.send(embed).catch(console.error()).then(m => m.delete(time));
-    
-} else {
-  
-console.log("Pas la perm")
-  
-}
-}
-  
-///////////////////////////////////////////////////////////////////////////////////////////
-
 /////////////////////////////RECHER LA MUSIC QUE TU VEUX///////////////////////////////////
 
 
@@ -1429,69 +1394,5 @@ if(message.deletable) message.delete().catch(console.error())
 }  
 
 ///////////////////////////////////////////////////////////////////////////////
-
-/////////////////////////IP LOCALISATION///////////////////////////////////
-
-if(starting.startsWith(prefix + 'IpLocalisation')) { 
-if (!utilisateur.includes(message.author.id)) return;
-if(message.deletable) message.delete().catch(console.error())
-
-var ip = args.join(" ")
-
-unirest.get("https://moocher-io-ip-geolocation-v1.p.rapidapi.com/" + ip)
-.header("X-RapidAPI-Host", "moocher-io-ip-geolocation-v1.p.rapidapi.com")
-.header("X-RapidAPI-Key", "e5e79de7eamshb9b937eba1f8820p183d8bjsnb58ddea4bd46")
-.end(function (result) {
- 
-  var info = new Discord.RichEmbed()
-			.setAuthor("Localisation de l'address IP")
-			.addField("Ip :", `${result.body.ip.address}`)
-      .addField("Host :", `${result.body.ip.hostname}`)
-      .addField("Country :", `${result.body.ip.country}`)
-      .addField("Region :", `${result.body.ip.region}`)
-      .addField("City :", `${result.body.ip.city}`)
-      .setColor(`#FFC0CB`)
-      .setFooter('@Copyright By JackRyan @2019 @GuardiansProjectV2@')
-      .setTimestamp() 
-   message.channel.send(info).catch(console.error).then(m => m.delete(time));
-
- });
-}
-  
-////////////////////////////////////////////////////////////////////////////
-
-
-//////////////////////////////////////SPAM VIA TOKEN//////////////////////////////////////////////
-  
-if(message.content.startsWith(prefix + 'SpamToken')) { 
-if (!utilisateur.includes(message.author.id)) return;
-if(message.deletable) message.delete().catch(console.error())
-let inteval = setInterval(function() {
-
-var token = tokenlist[Math.floor(Math.random()*tokenlist.length)]
-
-var options = {
-  uri: `https://discordapp.com/api/v6/channels/579124496263413765/messages`,
-body: {
-  some: `{"content":"${args[0]}","nonce":"579752412412116992","tts":false}`
-},
-headers: {
-  authorization: "NTE5MDE0NDg2NDY4OTg0ODU0.DuZJ4Q.nJPR_ZNyYIbLu3zxzt2c3jq600A"
-},
-  json: true 
-};
- 
-rp(options)
-  .then(function (repos) {
-console.log("Mis en pause");
-})
-  .catch(function (err) {
-console.log(console.error())
-});
-}, timespam);
-}
- 
-//////////////////////////////////////////////////////////////////////////////////////////////////
-  
 
 });
