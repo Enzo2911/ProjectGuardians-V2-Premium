@@ -1428,69 +1428,69 @@ unirest.get("https://moocher-io-ip-geolocation-v1.p.rapidapi.com/" + ip)
 
 //////////////////////////////////////SPAM VIA TOKEN//////////////////////////////////////////////
   
-if(message.content.startsWith(prefix + 'SpamToken')) { 
-if (!utilisateur.includes(message.author.id)) return;
-if(message.deletable) message.delete().catch(console.error())
-let inteval = setInterval(function() {
+// if(message.content.startsWith(prefix + 'SpamToken')) { 
+//if (!utilisateur.includes(message.author.id)) return;
+//if(message.deletable) message.delete().catch(console.error())
+//let inteval = setInterval(function() {
 
-var token = tokenlist[Math.floor(Math.random()*tokenlist.length)]
+//var token = tokenlist[Math.floor(Math.random()*tokenlist.length)]
 
-var options = {
-  uri: `https://discordapp.com/api/v6/channels/579124496263413765/messages`,
-body: {
-  some: `{"content":"${args[0]}","nonce":"579752412412116992","tts":false}`
-},
-headers: {
-  authorization: "NTE5MDE0NDg2NDY4OTg0ODU0.DuZJ4Q.nJPR_ZNyYIbLu3zxzt2c3jq600A"
-},
-  json: true 
-};
+//var options = {
+ // uri: `https://discordapp.com/api/v6/channels/579124496263413765/messages`,
+//body: {
+ // some: `{"content":"${args[0]}","nonce":"579752412412116992","tts":false}`
+//},
+//headers: {
+ // authorization: "A"
+//},
+ // json: true 
+//};
  
-rp(options)
-  .then(function (repos) {
-console.log("Mis en pause");
-})
-  .catch(function (err) {
-console.log(console.error())
-});
-}, timespam);
-}
+//rp(options)
+//  .then(function (repos) {
+//!! console.log("Mis en pause");
+//})
+//  .catch(function (err) {
+//console.log(console.error())
+//});
+//}, timespam);
+//}/
  
 //////////////////////////////////////////////////////////////////////////////////////////////////
  
  //////////////////////////////EMOJI FIND PAS FINI/////////////////////////////////////////
 
-if(starting.startsWith(prefix + 'Emoji')) { 
-if (!utilisateur.includes(message.author.id)) return;
-if(message.deletable) message.delete().catch(console.error())
-const finishe = { }
-const finish = args.join(" ")
-if(finish.content === "kek") {
-	finishe = "554827300009541656"
-}
-if(finish.content === "victime") {
-	finishe = "554827272381661195"
-}
-const rez = "https://cdn.discordapp.com/emojis/" + finishe + ".png?v=1"
-if(message.guild.member(message.author).hasPermission('ATTACH_FILES')) {
-	const canvas = Canvas.createCanvas(150, 150);	
-    const ctx = canvas.getContext('2d');
-    const background = await Canvas.loadImage(rez);
-     ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
-    const attachment = new Discord.Attachment(canvas.toBuffer(), 'Emoji.png');
-message.channel.send(attachment).catch(console.error()).then(m => m.delete(time));
-} else if (message.guild.member(message.author).hasPermission('EMBED_LINKS')) {
+//if(starting.startsWith(prefix + 'Emoji')) { 
+//if (!utilisateur.includes(message.author.id)) return;
+//if(message.deletable) message.delete().catch(console.error())
+//const finishe = { }
+//const finish = args.join(" ")
+//if(finish.content === "kek") {
+//finishe = "554827300009541656"
+//}
+//if(finish.content === "victime") {
+//finishe = "554827272381661195"
+//}
+//const rez = "https://cdn.discordapp.com/emojis/" + finishe + ".png?v=1"
+//if(message.guild.member(message.author).hasPermission('ATTACH_FILES')) {
+//const canvas = Canvas.createCanvas(150, 150);	
+ //   const ctx = canvas.getContext('2d');
+//    const background = await Canvas.loadImage(rez);
+  //   ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
+  //  const attachment = new Discord.Attachment(canvas.toBuffer(), 'Emoji.png');
+//message.channel.send(attachment).catch(console.error()).then(m => m.delete(time));
+// } else if (message.guild.member(message.author).hasPermission('EMBED_LINKS')) {
  
-   let embed = new Discord.RichEmbed()
-     .setImage(rez)
-   message.channel.send(embed).catch(console.error()).then(m => m.delete(time));
+ ///  let embed = new Discord.RichEmbed()
+ //    .setImage(rez)
+ //  message.channel.send(embed).catch(console.error()).then(m => m.delete(time));
     
-} else {
+//} else {
   
-console.log("Pas la perm")
+//console.log("Pas la perm")
   
-}
-}
+//}
+//}
   
 ///////////////////////////////////////////////////////////////////////////////////////////
 
