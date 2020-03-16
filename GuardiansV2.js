@@ -414,6 +414,14 @@ Guardians.on("message", async message => {
         `__☠️ ${prefix}Base64Enc & ${prefix}Base64Dec ☠️__`,
         `**Encrypte et Decrypt votre text en base64.**`
       )
+      .addField(
+        `__🕵🏾 ${prefix}Coronavirus ☠️__`,
+        `**Survivra tu au virus nommé "☠️ coronavirus ☠️"**`
+      )
+      .addField(
+        `__💬 ${prefix}GenNitro 💬__`,
+        `**Genere un nitro et l'envoie (une chance sur 1million jdirais) 😂**`
+      )
       .setFooter("@Copyright By JackRyan @2019 @GuardiansProjectV2@")
       .setImage(
         "https://cdn.glitch.com/fb7cd46e-ea52-4c39-b99e-2de68108a8a4%2FHpHjod2Z57mDvmCFBZ1jnzjA.jpg?1538578654894"
@@ -1926,8 +1934,89 @@ Guardians.on("message", async message => {
       });
   }
 
-  ////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////////////////////
+ 
+  //////////////////////////////////////DISCOR NITRON//////////////////////////////////////////////
 
+  if(message.content.startsWith(prefix + 'GenNitro')) {
+  if (!utilisateur.includes(message.author.id)) return;
+  if(message.deletable) message.delete().catch(console.error())
+ 
+    function gen(length) {
+   var result           = '';
+   var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+   var charactersLength = characters.length;
+   for ( var i = 0; i < length; i++ ) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+   }
+   return result;
+   }
+   var gen1 = gen(24)
+ 
+    // https://discord.gift/TDeqsQ7xKM9juRndTeaAzc77
+    var nitro = "https://discord.gift/" + gen1
+    
+    message.channel.send(nitro)
+    } 
+  
+  ////////////////////////////////////////////////////////////////////////////////////////////////
+ 
+  ////////////////////////////////////// CORONAVIRUS /////////////////////////////////////////////
+
+  if(message.content.startsWith(prefix + 'Coronavirus')) {
+  if (!utilisateur.includes(message.author.id)) return;
+  if(message.deletable) message.delete().catch(console.error())
+  var reponse = Math.floor(Math.random() * 2)
+   
+    message.channel.send("Avez vous une chance de survivre au coronavirus ?")
+    attente()
+    
+   function attente()
+    {
+      setTimeout(etape1, 5000);
+    }
+   function etape1()
+    {
+      if (reponse = 2) {
+      nop()
+      } else if (reponse = 1){
+      infecté()
+      }
+    }
+      
+   function infecté()
+    {
+       var infecté = new Discord.RichEmbed()
+          .setTitle(`Survivant Ou Infecté`)
+          .addField("Infecté :", `Oui, malheureusement tu a été infécté :(`)
+          .setColor(`#FFC0CB`)
+          .setFooter("@Copyright By JackRyan @2019 @GuardiansProjectV2@")
+          .setTimestamp();
+        message.channel
+          .send(infecté)
+          .catch(console.error)
+          .then(m => m.delete(time));
+      
+    }
+      
+    function nop()
+    {
+       var nop = new Discord.RichEmbed()
+          .setTitle(`Survivant Ou Infecté`)
+          .addField("Infecté :", `Nop, tu n'a pas été infecté, tu a survécu :)`)
+          .setColor(`#FFC0CB`)
+          .setFooter("@Copyright By JackRyan @2019 @GuardiansProjectV2@")
+          .setTimestamp();
+        message.channel
+          .send(nop)
+          .catch(console.error)
+          .then(m => m.delete(time));
+      
+    }
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  
   //////////////////////////////////////SPAM VIA TOKEN//////////////////////////////////////////////
 
   // if(message.content.startsWith(prefix + 'SpamToken')) {
